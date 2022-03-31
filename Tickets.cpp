@@ -35,19 +35,27 @@ int main(){
 
     for(int j = 0; j < NTicket; j++){
         string rut = *(RutId + (0 + rand() % NFuncionarios));
+
+        int hour = 0 + rand() % 24;
+        int minute = 0 + rand() % 60;
+
+        string minutes = (minute < 10) ? '0' + to_string(minute) : to_string(minute);
+        string hours = (hour < 10) ? '0' + to_string(hour) : to_string(hour);
+
+
+        string time = hours + ':' + minutes;
+
         for(int i = 0; i < 10; i++){
             TicketDict[j].rut_funcionario[i] = *(rut.c_str()+ i);
+
+            if(i < 5){
+                TicketDict[j].time[i] = *(time.c_str() + i);
+            }
         }
 
-        TicketDict[j].time[0] = '0' + (0 + rand() % 3);
-        TicketDict[j].time[1] = '0' + (0 + rand() % 9);
-        TicketDict[j].time[2] = ':';
-        TicketDict[j].time[3] = '0' + (0 + rand() % 6);
-        TicketDict[j].time[4] = '0' + (0 + rand() % 9);
         TicketDict[j].time[5] = '\0';
 
         TicketDict[j].day_of_month = 0 + rand() % 31;
-
     }
 
     delete [] RutId;
