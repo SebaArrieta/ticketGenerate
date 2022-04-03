@@ -10,6 +10,16 @@ struct Ticket {
     char time[6];
 };
 
+struct TicketValido {
+    Ticket ticket;
+    bool valido;
+};
+
+struct Servicios{
+    string nombre;
+    int limDiarios, limMensuales;
+    char horaInicio[5],horaFin[5];
+};
 
 void merge(Ticket *arreglo,int inicio, int mitad, int final,int opcion){
     int i,j,k;
@@ -31,12 +41,12 @@ void merge(Ticket *arreglo,int inicio, int mitad, int final,int opcion){
     k = inicio;
 
     while(i < elementosIzq && j < elementosDer){
-        switch(opcion){ // si se busca el rut, pueden ser 3 casos, faltan implementar los otros 
+        switch(opcion){ // si se busca el rut, pueden ser 3 casos
                        
             case 1: // opcion = 1 comparan rut
                 if(strcmp(izquierda[i].rut_funcionario,derecha[j].rut_funcionario) <= 0 ){
-                arreglo[k] = izquierda[i];
-                i++;
+                    arreglo[k] = izquierda[i];
+                    i++;
                 }else{
                     arreglo[k] = derecha[j];
                     j++;
@@ -117,24 +127,54 @@ void imprimirArreglo(Ticket *arreglo, int n, int opcion){
 
 int main(){
     int NTicket;
+    int NServicios;
     int Cantidad_Funcionarios = 1;
 
+    //Guardar Servicios en el arreglo "Servicios"
     ifstream fp;
+
+    fp.open("Servicios.txt");
+    fp >> NServicios;
+
+    Servicios servicio[NServicios];
+
+    for(int s = 0; s < NServicios; s++){
+        fp >> servicio[s].nombre;
+        fp >> servicio[s].limDiarios;
+        fp >> servicio[s].limMensuales;
+        fp >> servicio[s].horaInicio;
+        fp >> servicio[s].horaFin;
+    }
+
+    for(int s = 0; s < NServicios; s++){
+        cout << servicio[s].limDiarios << endl;
+    }
+
+    fp.close();
+
+    //Guardar tickets en el arreglo "readt"
     fp.open("Tickets.dat", ios::binary);
+    
     if (!fp.is_open () ) {
         cerr << " no se pudo abrir el archivo " << endl ;
         exit (1);
     }
+    
     fp.seekg(0);
     fp.read((char*)&NTicket, sizeof(int));
 
     Ticket *readt = new Ticket[NTicket];
+    TicketValido *READT = new TicketValido[NTicket];
 
     for(int i = 0; i < NTicket; i++){
         fp.seekg(sizeof(int) + sizeof(Ticket)*i);
         fp.read((char*)&readt[i], sizeof(Ticket));
+        fp.read((char*)&READT[i].ticket, sizeof(Ticket));
+        TicketValido t = *(READT + i);
+        t.valido = true;
     }
     
+    //Obtener el numer
     for(int j = 1; j < NTicket; j++){
         bool exist = false;
         for(int r = 0; r < Cantidad_Funcionarios; r++){
@@ -142,20 +182,54 @@ int main(){
                 exist = true;
             }
         }
-        
         if(!exist){
-
             Cantidad_Funcionarios++;
-        }else{
-            exist = false;
         }
     }
-    imprimirArreglo(readt,NTicket,1);
-    mergeSort(readt,0,NTicket-1,1);
-    imprimirArreglo(readt,NTicket,1);
-    delete[] readt;
     fp.close();
+
+    char rutActual[10];
+    strcpy(rutActual,readt[0].rut_funcionario);
+
+    int inicio = 0;
+    for(int i = 0; i<NTicket; i++){
+        if(strcmp(readt[i].rut_funcionario,rutActual) != 0){
+            strcpy(rutActual,readt[i].rut_funcionario);
+            mergeSort(readt,inicio,i-1,2);
+            inicio = i;
+        }
+    }
+
+    mergeSort(READT,0,NTicket-1,1);
+
+    strcpy(rutActual,READT[0].ticket.rut_funcionario);
+    int invalido = 0;
+
+    int limite = 100;
+    int contador = 0;
+    for(int j = 0; j < NTicket; j++){
+        if(strcmp(READT[j].ticket.rut_funcionario, rutActual)){
+            contador++;
+        }else{
+            if(contador > limite){
+                invalido++;
+            }
+            //strcpy(rutActual,readt[j].rut_funcionario);
+            break;
+        }
+    }
+
+
+    cout << invalido;
+
+    mergeSort(readt,inicio,NTicket-1,2);
+    //imprimirArreglo(readt,NTicket,1);
+    mergeSort(readt,0,NTicket-1,1);
+    //imprimirArreglo(readt,NTicket,1);
+    delete[] readt;
+
     return 0;
 }
+
 
 
