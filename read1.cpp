@@ -8,11 +8,8 @@ struct Ticket {
     char rut_funcionario[10];
     int day_of_month;
     char time[6];
-};
-
-struct TicketValido {
-    Ticket ticket;
-    bool valido;
+    
+    bool valido = true;
 };
 
 struct Servicios{
@@ -119,6 +116,10 @@ void imprimirArreglo(Ticket *arreglo, int n, int opcion){
             for(int i = 0; i < n; i++){
                 cout << arreglo[i].time << " ";
             }
+        case 4:
+            for(int i = 0; i < n; i++){
+                cout << arreglo[i].valido << " ";
+            }
             break;
  
     }
@@ -146,10 +147,6 @@ int main(){
         fp >> servicio[s].horaFin;
     }
 
-    for(int s = 0; s < NServicios; s++){
-        cout << servicio[s].limDiarios << endl;
-    }
-
     fp.close();
 
     //Guardar tickets en el arreglo "readt"
@@ -164,16 +161,27 @@ int main(){
     fp.read((char*)&NTicket, sizeof(int));
 
     Ticket *readt = new Ticket[NTicket];
-    TicketValido *READT = new TicketValido[NTicket];
+    //TicketValido *READT = new TicketValido[NTicket];
 
     for(int i = 0; i < NTicket; i++){
+        Ticket t = *(readt + i);
+        
+        struct readTicket{
+            char rut_funcionario[10];
+            int day_of_month;
+            char time[6];
+        };
+
+        readTicket p;
+
         fp.seekg(sizeof(int) + sizeof(Ticket)*i);
-        fp.read((char*)&readt[i], sizeof(Ticket));
-        fp.read((char*)&READT[i].ticket, sizeof(Ticket));
-        TicketValido t = *(READT + i);
-        t.valido = true;
+        fp.read((char*)&p, sizeof(Ticket));
+        /*fp.read((char*)&READT[i].ticket, sizeof(Ticket));*/
+
+        strcpy(t.rut_funcionario,p.rut_funcionario);
+        strcpy(t.time,p.time);
+        t.day_of_month = p.day_of_month;
     }
-    
     //Obtener el numer
     for(int j = 1; j < NTicket; j++){
         bool exist = false;
@@ -200,27 +208,27 @@ int main(){
         }
     }
 
-    mergeSort(READT,0,NTicket-1,1);
+    mergeSort(readt,0,NTicket-1,1);
 
-    strcpy(rutActual,READT[0].ticket.rut_funcionario);
-    int invalido = 0;
+    Ticket j = *(readt);
+    strcpy(rutActual,j.rut_funcionario);
 
-    int limite = 100;
     int contador = 0;
     for(int j = 0; j < NTicket; j++){
-        if(strcmp(READT[j].ticket.rut_funcionario, rutActual)){
+        Ticket t = *(readt + j);
+        if(strcmp(t.rut_funcionario, rutActual) == 0){
             contador++;
-        }else{
-            if(contador > limite){
-                invalido++;
+            if(contador > 100){
+                t.valido = false;
             }
-            //strcpy(rutActual,readt[j].rut_funcionario);
+        }else{
+            contador = 1;
+            strcpy(rutActual,t.rut_funcionario);
             break;
         }
     }
-
-
-    cout << invalido;
+  
+    imprimirArreglo(readt,NTicket,4);
 
     mergeSort(readt,inicio,NTicket-1,2);
     //imprimirArreglo(readt,NTicket,1);
@@ -230,6 +238,7 @@ int main(){
 
     return 0;
 }
+
 
 
 
