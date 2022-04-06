@@ -8,7 +8,6 @@ struct Ticket {
     char rut_funcionario[10];
     int day_of_month;
     char time[6];
-    
     bool valido = true;
 };
 
@@ -116,15 +115,86 @@ void imprimirArreglo(Ticket *arreglo, int n, int opcion){
             for(int i = 0; i < n; i++){
                 cout << arreglo[i].time << " ";
             }
-        case 4:
-            for(int i = 0; i < n; i++){
-                cout << arreglo[i].valido << " ";
-            }
-            break;
  
     }
     cout << endl;
 }
+
+bool RangoHoras(char *incio, char *fin, char *time){
+    return true;
+};
+
+void RestriccionesTickets(Ticket *readt, int NTicket, int NServicios, Servicios *servicio){
+    int inicio = 0;
+
+    int day = readt[0].day_of_month;
+
+    for(int i = 0; i<NTicket; i++){
+        if(readt[i].day_of_month == day){
+            day = readt[i].day_of_month;
+            mergeSort(readt,inicio,i-1,3);
+            inicio = i;
+        }
+    }
+    
+    for(int j = 0; j < NServicios; j++){
+        char rutActual[10];
+        strcpy(rutActual,readt[0].rut_funcionario);
+
+        int day = readt[0].day_of_month;
+        int contadorMensual = 0;
+        int contadorDia = 0;
+
+        for(int i = 0; i<NTicket; i++){
+            if(strcmp(readt[i].rut_funcionario, rutActual) == 0){
+                if(RangoHoras(servicio[j].horaInicio, servicio[j].horaFin, readt[i].time)){
+
+                    if(day == readt[i].day_of_month){
+                        contadorDia++;
+                        if(contadorDia > servicio[j].limDiarios){
+                            readt[i].valido = false;
+                        }
+                    }else{
+                        day = readt[i].day_of_month;
+                    }
+
+                    contadorMensual++;
+
+                    if(contadorMensual > servicio[j].limMensuales){
+                            readt[i].valido = false;
+                        }
+
+                }else{
+                    readt[i].valido = false;
+                }
+            }else{
+                strcpy(rutActual,readt[i].rut_funcionario);
+            }
+            
+        }  
+    }
+};
+
+void LimiteMensualTotal(Ticket *readt, int NTicket){
+    mergeSort(readt,0,NTicket-1,1);
+    char rutActual[10];
+
+    strcpy(rutActual,readt[0].rut_funcionario);
+
+    int contador = 0;
+    for(int j = 0; j < NTicket; j++){
+        if(strcmp(readt[j].rut_funcionario, rutActual) == 0){
+            contador++;
+            if(contador > 100){
+                readt[j].valido = false;
+            }
+        }else{
+            contador = 1;
+            strcpy(rutActual,readt[j].rut_funcionario);
+            break;
+        }
+    }
+};
 
 int main(){
     int NTicket;
@@ -160,12 +230,10 @@ int main(){
     fp.seekg(0);
     fp.read((char*)&NTicket, sizeof(int));
 
-    Ticket *readt = new Ticket[NTicket];
-    //TicketValido *READT = new TicketValido[NTicket];
+    Ticket readt[NTicket];
 
     for(int i = 0; i < NTicket; i++){
-        Ticket t = *(readt + i);
-        
+
         struct readTicket{
             char rut_funcionario[10];
             int day_of_month;
@@ -176,14 +244,13 @@ int main(){
 
         fp.seekg(sizeof(int) + sizeof(Ticket)*i);
         fp.read((char*)&p, sizeof(Ticket));
-        /*fp.read((char*)&READT[i].ticket, sizeof(Ticket));*/
 
-        strcpy(t.rut_funcionario,p.rut_funcionario);
-        strcpy(t.time,p.time);
-        t.day_of_month = p.day_of_month;
+        strcpy(readt[i].rut_funcionario,p.rut_funcionario);
+        strcpy(readt[i].time,p.time);
+        readt[i].day_of_month = p.day_of_month;
     }
     //Obtener el numer
-    for(int j = 1; j < NTicket; j++){
+    /*for(int j = 1; j < NTicket; j++){
         bool exist = false;
         for(int r = 0; r < Cantidad_Funcionarios; r++){
             if((strcmp(readt[r].rut_funcionario, readt[j].rut_funcionario) == 0)){
@@ -193,52 +260,19 @@ int main(){
         if(!exist){
             Cantidad_Funcionarios++;
         }
-    }
+    }*/
     fp.close();
 
-    char rutActual[10];
-    strcpy(rutActual,readt[0].rut_funcionario);
-
-    int inicio = 0;
-    for(int i = 0; i<NTicket; i++){
+    /*for(int i = 0; i<NTicket; i++){
         if(strcmp(readt[i].rut_funcionario,rutActual) != 0){
             strcpy(rutActual,readt[i].rut_funcionario);
             mergeSort(readt,inicio,i-1,2);
             inicio = i;
         }
-    }
+    }*/
 
-    mergeSort(readt,0,NTicket-1,1);
-
-    Ticket j = *(readt);
-    strcpy(rutActual,j.rut_funcionario);
-
-    int contador = 0;
-    for(int j = 0; j < NTicket; j++){
-        Ticket t = *(readt + j);
-        if(strcmp(t.rut_funcionario, rutActual) == 0){
-            contador++;
-            if(contador > 100){
-                t.valido = false;
-            }
-        }else{
-            contador = 1;
-            strcpy(rutActual,t.rut_funcionario);
-            break;
-        }
-    }
-  
-    imprimirArreglo(readt,NTicket,4);
-
-    mergeSort(readt,inicio,NTicket-1,2);
-    //imprimirArreglo(readt,NTicket,1);
-    mergeSort(readt,0,NTicket-1,1);
-    //imprimirArreglo(readt,NTicket,1);
-    delete[] readt;
+    LimiteMensualTotal(readt, NTicket);
+    RestriccionesTickets(readt, NTicket, NServicios, servicio);
 
     return 0;
 }
-
-
-
-
