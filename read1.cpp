@@ -147,8 +147,8 @@ void RestriccionesTickets(Ticket *readt, int NTicket, int NServicios, Servicios 
 
         for(int i = 0; i<NTicket; i++){
             if(strcmp(readt[i].rut_funcionario, rutActual) == 0){
-                if(RangoHoras(servicio[j].horaInicio, servicio[j].horaFin, readt[i].time)){
-
+                if(strcomp(readt[i].time, servicio[j].horaInicio) >=0 && strcomp(readt[i].time, servicio[j].horaFin) <=0){
+           
                     if(day == readt[i].day_of_month){
                         contadorDia++;
                         if(contadorDia > servicio[j].limDiarios){
