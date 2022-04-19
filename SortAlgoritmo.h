@@ -4,24 +4,6 @@
 # include <stdlib.h>
 using namespace std;
 
-struct Ticket {
-    char rut_funcionario[10];
-    int day_of_month;
-    char time[6];
-};
-
-struct punteroTicket{
-    Ticket punteroT;
-    string nombre;
-    bool valido;
-};
-
-struct Servicios{
-    string nombre;
-    int limDiarios, limMensuales,diarios, mensuales;
-    char horaInicio[6],horaFin[6];
-};
-
 /*****
 * void merge
 ******
@@ -36,17 +18,18 @@ struct Servicios{
 * .......
 ******
 * Returns:
-* Void
+* void
 *****/
-
 void merge(punteroTicket *arreglo,int inicio, int mitad, int final,int opcion){
     int i,j,k;
     int elementosIzq = mitad - inicio + 1;
     int elementosDer = final - mitad;
 
+    //crea un arreglo de puntero ticket tanto para los arreglos que se encuentren por la izquierda y para los de la derecha
     punteroTicket izquierda[elementosIzq];
     punteroTicket derecha[elementosDer];
 
+    //añade los elementos correspondientes a ambos arreglos
     for(int i = 0; i < elementosIzq; i++){
         izquierda[i] = arreglo[inicio + i];
     }
@@ -58,9 +41,9 @@ void merge(punteroTicket *arreglo,int inicio, int mitad, int final,int opcion){
     j = 0;
     k = inicio;
 
+    //while que reccorre y compara los elementos de la izquiera y de la derecha para ordenarlos
     while(i < elementosIzq && j < elementosDer){
-        switch(opcion){ // si se busca el rut, pueden ser 3 casos, faltan implementar los otros 
-                       
+        switch(opcion){ // si se busca el rut, pueden ser 3 casos     
             case 1: // opcion = 1 comparan rut
                 if(strcmp(izquierda[i].punteroT.rut_funcionario,derecha[j].punteroT.rut_funcionario) <= 0 ){
                 arreglo[k] = izquierda[i];
@@ -111,6 +94,7 @@ void merge(punteroTicket *arreglo,int inicio, int mitad, int final,int opcion){
 
 }
 
+
 /*****
 * void mergeSort
 ******
@@ -125,12 +109,10 @@ void merge(punteroTicket *arreglo,int inicio, int mitad, int final,int opcion){
 * .......
 ******
 * Returns:
-* Void
+* void
 *****/
-
-
-
 void mergeSort(punteroTicket *arreglo,int inicio, int final, int opcion){
+    //caso base para que se deje de cumplir la recursividad
     if(inicio < final){
         int mitad = inicio + (final - inicio)/2;
         mergeSort(arreglo,inicio,mitad,opcion);
@@ -139,26 +121,28 @@ void mergeSort(punteroTicket *arreglo,int inicio, int final, int opcion){
     }
 }
 
+
 /*****
 * void  orden
 ******
-* Funcion que toma el arreglo ordenado de ruts y luego los ordena dependiendo de la opcion (dia u hora)
+* Funcion que busca tomar un arreglo ordenado de rut y luego los ordenarlos aparte de por rut por (dia u hora)
 ******
 * Input:
 * punteroTicket *arreglo: puntero al arreglo de Tickets,
   int NTicket: Cantidad de elementos en el arreglo PunteroTicket
-  int opcion: opcion que indica si se quiere ordenar mediante, rut, horas o dia
+  int opcion: opcion que indica si se quiere ordenar mediante: rut, horas o dias
 * .......
 ******
 * Returns:
-* Void
+* void
 *****/
-
 void orden(punteroTicket *ticket, int NTicket,int opcion){
     char rutActual[10];
     strcpy(rutActual,ticket[0].punteroT.rut_funcionario);
 
     int inicio = 0;
+    /*va recorriendo el arreglo, como están ordenados por rut cuando llegue a un rut distinto al actual
+    copia el rut que se encontró y luego llama a la función mergeSort para que ordenene el arreglo solo hasta donde se encontraban los rut iguales */
     for(int i = 0; i<NTicket; i++){
         if(strcmp(ticket[i].punteroT.rut_funcionario,rutActual) != 0){
             strcpy(rutActual,ticket[i].punteroT.rut_funcionario);
