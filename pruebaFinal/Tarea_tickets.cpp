@@ -6,26 +6,6 @@
 # include "Validar.h"
 using namespace std;
 
-//Structs utilizados en el proceso de recolección y procesamiento de los datos entregados en los archivos solicitados como el sevicios.txt o el tickets.dat
-struct Ticket {
-    char rut_funcionario[10];
-    int day_of_month;
-    char time[6];
-};
-
-struct Servicios{
-    string nombre;
-    int limDiarios, limMensuales,diarios, mensuales;
-    char horaInicio[6],horaFin[6];
-};
-
-//Struct utilizado en el arreglo que contiene a todos los tickets cuya caracteristica principal es almacenar el struct Ticket junto con un bool que lo valida.
-struct punteroTicket{
-    Ticket punteroT;
-    string nombre;
-    bool valido;
-};
-
 /*****
  * int main
 ******
@@ -80,7 +60,7 @@ int main(){
     punteroTicket ticket[NTicket];
 
     for(int i = 0; i < NTicket; i++){
-        fp.read((char*)&rticket[i].punteroT, sizeof(Ticket)); // lee sizeof(Ticket) bytes y los guarda en cada posicion correspondiente del arreglo readt
+        fp.read((char*)&ticket[i].punteroT, sizeof(Ticket)); // lee sizeof(Ticket) bytes y los guarda en cada posicion correspondiente del arreglo readt
         //ticket[i].punteroT = readt[i]; //guarda lo que tiene readt
         ticket[i].valido = true; //establece todos los ticket como validos
     }
