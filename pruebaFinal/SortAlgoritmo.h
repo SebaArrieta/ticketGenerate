@@ -4,6 +4,26 @@
 # include <stdlib.h>
 using namespace std;
 
+//Structs utilizados en el proceso de recolección y procesamiento de los datos entregados en los archivos solicitados como el sevicios.txt o el tickets.dat
+struct Ticket {
+    char rut_funcionario[10];
+    int day_of_month;
+    char time[6];
+};
+
+struct Servicios{
+    string nombre;
+    int limDiarios, limMensuales,diarios, mensuales;
+    char horaInicio[6],horaFin[6];
+};
+
+//Struct utilizado en el arreglo que contiene a todos los tickets cuya caracteristica principal es almacenar el struct Ticket junto con un bool que lo valida.
+struct punteroTicket{
+    Ticket punteroT;
+    string nombre;
+    bool valido;
+};
+
 /*****
 * void merge
 ******
@@ -153,4 +173,3 @@ void orden(punteroTicket *ticket, int NTicket,int opcion){
     }
     mergeSort(ticket,inicio,NTicket-1,opcion);
 }
-
