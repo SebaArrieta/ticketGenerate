@@ -83,6 +83,7 @@ void validar(punteroTicket *ticket, int NTicket,Servicios *servicio, int Nservic
 
     strcpy(rutActual,ticket[0].punteroT.rut_funcionario);
     int diaActual = ticket[0].punteroT.day_of_month;
+    int diaMidnight = 0;
 
     //Condsidera invalidos los que superen el limite diarios de ticket en x dia
     for(int i = 0; i<NTicket; i++){
@@ -93,24 +94,36 @@ void validar(punteroTicket *ticket, int NTicket,Servicios *servicio, int Nservic
                 servicio[j].diarios = 0;
             }
             diaActual = ticket[0].punteroT.day_of_month;
-        }else{
-            if(diaActual != ticket[i].punteroT.day_of_month){
-                for(int j = 0 ; j<Nservicios; j++){ //reiniciamos los diarios
-                    servicio[j].diarios = 0;
-                }
-                diaActual = ticket[i].punteroT.day_of_month;
+        }
+        if(diaActual != ticket[i].punteroT.day_of_month){
+            for(int j = 0 ; j<Nservicios; j++){ //reiniciamos los diarios
+                servicio[j].diarios = 0;
+            }
+            diaActual = ticket[i].punteroT.day_of_month;
+        }
 
-            }else{
-                for(int j = 0; j<Nservicios;j++){//recorre el Nservicios buscando en cual hora es igual
-                    if(ticket[i].valido && servicio[j].nombre == ticket[i].nombre){ // si el ticket es valido y tiene el mismo nombre de servicio
-                        if(servicio[j].diarios >= servicio[j].limDiarios){ //en caso que supere el lim diario el ticket es falso;
-                            ticket[i].valido = false;
-                        }else{
-                            servicio[j].diarios++;
+        for(int j = 0; j<Nservicios;j++){//recorre el Nservicios buscando en cual hora es igual
+            if(ticket[i].valido && servicio[j].nombre == ticket[i].nombre){ // si el ticket es valido y tiene el mismo nombre de servicio
+
+                if(strcmp(servicio[j].horaFin, servicio[j].horaInicio)<= 0){
+                    if((strcmp(ticket[i].punteroT.time,servicio[j].horaInicio)>= 0 && strcmp(ticket[i].punteroT.time,"23:59")<= 0)){
+                        if(diaMidnight == 0){
+                            diaMidnight = diaActual + 1;
                         }
-                        break;                    
+                    }
+                    if(strcmp(ticket[i].punteroT.time,servicio[j].horaFin)<=0 && strcmp(ticket[i].punteroT.time,"00:00")>= 0){
+                        if(diaMidnight == diaActual){
+                            servicio[j].diarios++;
+                            diaMidnight = 0;
+                        }
                     }
                 }
+                if(servicio[j].diarios >= servicio[j].limDiarios){ //en caso que supere el lim diario el ticket es falso;
+                    ticket[i].valido = false;
+                }else{
+                    servicio[j].diarios++;
+                }
+                break;                    
             }
         }
     }    
