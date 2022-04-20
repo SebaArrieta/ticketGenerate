@@ -52,16 +52,14 @@ int main(){
         cout << " no se pudo abrir el archivo " << endl ;
         exit(1);
     }
+
     fp.seekg(0); //pone el puntero en la primera posicion del archivo
     fp.read((char*)&NTicket, sizeof(int)); //lee sizeof(int) bytes y los guarda en NTicket
 
-    //se crea arreglo de tipo Ticket con memoria dinamica
-    //Ticket *readt = new Ticket[NTicket];
     punteroTicket ticket[NTicket];
 
     for(int i = 0; i < NTicket; i++){
         fp.read((char*)&ticket[i].punteroT, sizeof(Ticket)); // lee sizeof(Ticket) bytes y los guarda en cada posicion correspondiente del arreglo readt
-        //ticket[i].punteroT = readt[i]; //guarda lo que tiene readt
         ticket[i].valido = true; //establece todos los ticket como validos
     }
 
@@ -72,8 +70,6 @@ int main(){
     //llama a la funcion encargada de hacer la ultima validacion sobre los ticket totales mensuales y luego mostrar datos en pantalla
     imprimirYmaxMT(ticket,NTicket,servicio,Nservicios);
     
-    //libera la memoria reservada dinamicamente por readt
-    //delete[] readt;
     fp.close();
     return 0;
 }
