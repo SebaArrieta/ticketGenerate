@@ -32,7 +32,7 @@ void validar(punteroTicket *ticket, int NTicket,Servicios *servicio, int Nservic
         }
         for(int j = 0; j<Nservicios;j++){ //si la hora cumple con 1 servicio es true si no es false
             if(strcmp(servicio[j].horaFin, servicio[j].horaInicio)<= 0){ //if que compara si la hora final es menor o igual a la incial para tener en cuenta que empieza en un dia y termina en otro
-                if(strcmp(ticket[i].punteroT.time,servicio[j].horaInicio)>= 0 || strcmp(ticket[i].punteroT.time,servicio[j].horaFin)<=0){
+                if((strcmp(ticket[i].punteroT.time,servicio[j].horaInicio)>= 0 && strcmp(ticket[i].punteroT.time,"23:59")<= 0) || (strcmp(ticket[i].punteroT.time,servicio[j].horaFin)<=0 && strcmp(ticket[i].punteroT.time,"00:00")>= 0)){
                     opcion =  true;
                     posServ = j; //si la hora cumple cuarda la posicion del servicio que cumplió
                     break;
